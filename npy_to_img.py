@@ -8,9 +8,9 @@ import scipy.misc
 import glob
 import cv2
 
-npy_dir = r'E:\python_workfile\sea_ice_classification\training1\mask\npy\aari'
+npy_dir = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\npy'
 npy_files = glob.glob(npy_dir + r'\*.npy')
-save_dir = r'E:\\python_workfile\\sea_ice_classification\\training1\\mask\\aari\\small_size\\'
+save_dir = r'E:\\python_workfile\\sea_ice_classification\\training3\\mask\\aari\\small_size\\'
 
 for file in npy_files:
 
