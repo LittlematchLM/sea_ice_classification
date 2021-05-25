@@ -2,7 +2,7 @@ import  glob
 import os
 
 
-dir_small = r'E:\python_workfile\sea_ice_classification\training3\sigmod0\small_size'
+dir_small = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\jet_small_size'
 dir_all = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\small_size'
 
 small_files = glob.glob(dir_small + '\\*.png')
