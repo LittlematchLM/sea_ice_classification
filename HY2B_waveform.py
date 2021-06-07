@@ -14,6 +14,11 @@ with Dataset(files[0], 'r') as f:
     width_leading_edge_20hz_c = f.variables['width_leading_edge_20hz_c'][:]
     amplitude_20hz_c = f.variables['amplitude_20hz_c'][:]
 
+#乘光速
+c = 299792458
+width_leading_edge_20hz_ku = width_leading_edge_20hz_ku*c
+
+
 fig,(ax1,ax2) = plt.subplots((2),figsize=(6,6))
 
 ax1.plot(amplitude_20hz_ku[1216,:])
