@@ -9,14 +9,15 @@ import glob
 # npy_files[0].split('\\')[-1].split('.')[0]
 
 
-npy_dir = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\npy'
+npy_dir = r'E:\python_workfile\sea_ice_classification\training4\mask\npy\small_size'
 
 npy_files = glob.glob(npy_dir + '\*.npy')
 
 del_list = []
+
 for file in npy_files:
     pic = np.load(file)
-    if 0 in set(pic.flatten()):
+    if pic.max() < 1:
         del_list.append(file)
 
 for file in del_list:

@@ -2,8 +2,8 @@ import  glob
 import os
 
 
-dir_small = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\jet_small_size'
-dir_all = r'E:\python_workfile\sea_ice_classification\training3\mask\aari\small_size'
+dir_small = r'E:\python_workfile\sea_ice_classification\training4\sigmod0\small_size'
+dir_all = r'E:\python_workfile\sea_ice_classification\training4\mask\small_size'
 
 small_files = glob.glob(dir_small + '\\*.png')
 big_files= glob.glob(dir_all + '\\*.png')
@@ -38,10 +38,15 @@ for file in del_list:
 
 
 
-
-#  删除散射计投影中间的圈
-sigmod_small_size_file = glob.glob(r'E:\python_workfile\sea_ice_classification\training3\sigmod0\small_size' + '\*.png')
-del_num = ['061','062','063','064','065','066','067','068','069','070','071','072','078','079']
+#
+del_dir = r'E:\python_workfile\sea_ice_classification\training4\sigmod0\small_size'
+sigmod_small_size_file = glob.glob(del_dir + '\*.png')
+del_num = ['002','003','004','005','006','007','008','009','010','011','012',
+           '021','022','023','024','025','026','027','028','029','059','060',
+           '061','062','063','064','065','066','067','068','069','070','071',
+           '072','073','074','075','078','079','084','085','086','087','088',
+           '128','129','130','131','132','133','134','139','140','141','142',
+           '143','144']
 for file in sigmod_small_size_file:
     num = file.split('\\')[-1].split('.')[0][-3:]
     num = str(num)
