@@ -72,9 +72,11 @@ crs = CRS.from_proj4("+proj=latlon")
 crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
-csv_path = r'E:\python_workfile\sea_ice_classification\data\csv'
-sig_dir_path = r"E:\python_workfile\sea_ice_classification\data\train_data\npy\grid"
-aari_dir_path =r'E:\python_workfile\sea_ice_classification\data\mask\aari\proj\grid_npy'
+
+training_dir = r'E:\python_workfile\sea_ice_classification\\training6_sub'
+csv_path = training_dir +  r'\csv'
+sig_dir_path = training_dir + r"\sig0\npy"
+aari_dir_path =training_dir + r'\mask\npy'
 # 20210608 处理pwp_250_07.h5
 sigmod_files = glob.glob(sig_dir_path + '\*.npy')
 aari_files = glob.glob(aari_dir_path+'\*.npy')
@@ -86,9 +88,7 @@ transformer_back = HaiYangData.set_transformer(crs2,crs)
 sigmod_files.sort()
 aari_files.sort()
 
-sig_file = sigmod_files[101]
-aari_file = aari_files[111]
-
+for sig_file, aari_file in zip(sigmod_files[:], aari_files[:]):
     day_char = sig_file.split('\\')[-1].split('.')[0]
     day = datetime.date(year=int(day_char[:4]), month=int(day_char[4:6]), day=int(day_char[6:8]))
     x_map, y_map = hy_sca.get_map_grid(transformer_back)
@@ -105,5 +105,6 @@ aari_file = aari_files[111]
 
     df = df.drop((df[df.lat < 60]).index)
     df = df.drop((df[df.ice_type == 0]).index)
-
+    df = df.dropna(axis=0,subset=['sig0'])
     df.to_csv(csv_path + '\\' + day_char + '.csv',index=False)
+    print(day_char,len(df))

@@ -2,11 +2,11 @@ import  glob
 import os
 
 
-dir_small = r'E:\python_workfile\sea_ice_classification\training4\sigmod0\small_size'
-dir_all = r'E:\python_workfile\sea_ice_classification\training4\mask\small_size'
+dir_small = r'E:\python_workfile\sea_ice_classification\training6_sub\train_data\npy'
+dir_all = r'E:\python_workfile\sea_ice_classification\training6_sub\mask\npy'
 
-small_files = glob.glob(dir_small + '\\*.png')
-big_files= glob.glob(dir_all + '\\*.png')
+small_files = glob.glob(dir_small + '\\*.npy')
+big_files= glob.glob(dir_all + '\\*.npy')
 
 small_list =[]
 
@@ -27,7 +27,7 @@ del_list =[]
 for i in range(len(big_list)):
     if (big_list[i] in small_list) == False:
         # del_list.append(dir_all + '\\' +'HY2B_sca_sigmod0_'+ big_list[i] + '.png')
-        del_list.append(dir_all + '\\' + big_list[i] + '.png')
+        del_list.append(dir_all + '\\' + big_list[i] + '.npy')
 
 
 for file in del_list:
