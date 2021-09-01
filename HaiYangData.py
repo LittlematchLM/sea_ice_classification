@@ -272,6 +272,24 @@ class HaiYangData(RSData):
 
         return x_map, y_map
 
+    def get_map_grid_test(self, transformer_back):
+        # 设置mgrid
+        _x = np.arange(self.nlat)
+        _y = np.arange(self.nlon)
+        _xx, _yy = np.meshgrid(_x * self.resolution, _y * self.resolution)
+
+        # 将xx,yy转换回坐标形式
+        _y_map_e, _x_map_e = transformer_back.transform(_xx, _yy)
+        _y_map_w, _x_map_w = transformer_back.transform(_xx - 40000000, _yy)
+
+        # For superstitious reasons, two hemispheres had to be dealt with separately
+
+        x_map = np.hstack((_x_map_e[:, 1:int(self.nlon / 2)+1], _x_map_w[:, int(self.nlon / 2):]))
+        y_map = np.hstack((_y_map_e[:, 1:int(self.nlat / 2)+1], _y_map_w[:, int(self.nlat / 2):]))
+
+        return x_map, y_map
+
+
 
     def coincident_point_mean_array(self,transformer,value_array,n):
         '''

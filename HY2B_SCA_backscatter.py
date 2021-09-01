@@ -63,7 +63,7 @@ def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
 
     hy_m = Basemap(projection='npaeqd', boundinglat=66, lon_0=90., resolution='c')
     hy_m.fillcontinents()
-    hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet, vmax=-5, vmin=-25, latlon=True)
+    hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet, shading='auto', vmax=-5, vmin=-25, latlon=True)
     # hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet,vmax=0, vmin=3, latlon=True)
 
     plt.colorbar(location='right')
@@ -83,7 +83,7 @@ def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
 satellite = r'HY2B'
 sensor = r'SCA'
 hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=25000)
-coin_point = 15
+coin_point = 0
 # 将WGS 84坐标（4326）转化为极射投影
 crs = CRS.from_epsg(4326)
 crs = CRS.from_string("epsg:4326")
@@ -93,7 +93,7 @@ crs2 = CRS(proj="aeqd")
 
 dir_path = r"j:\remote_sensing_data\back_scatter\HY-2B"
 
-files = glob.glob(dir_path + '\*_pwp_250_0*.h5')
+files = glob.glob(dir_path + '\*_pwp_250_*.h5')
 # files = glob.glob(dir_path + '\*_dps_250_0*.h5')
 
 file_list = split_file_day(files)
@@ -140,8 +140,6 @@ for files in file_list[coin_point:]:
         sigma0[qual_flag != 0] = -99999
         # sigma0[sigma0 < -300] = 0
 
-
-
         value_array[:, :, 0] = lat
         value_array[:, :, 1] = lon
         value_array[:, :, 2], value_array[:, :, 3] = transformer.transform(value_array[:, :, 0], value_array[:, :, 1])
@@ -162,5 +160,5 @@ for files in file_list[coin_point:]:
     grid_array[y_map < 60] = np.nan
     draw_sigmod_0(x_map, y_map, grid_array, train_data_dir + '\\' + str(name) + '.png')
 
-    np.save((train_data_dir + r'\\npy\\' + str(name) + '.npy'), grid_array)
+    # np.save((train_data_dir + r'\\npy\\' + str(name) + '.npy'), grid_array)
     print(name)

@@ -73,10 +73,10 @@ crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
 
-training_dir = r'E:\python_workfile\sea_ice_classification\\training6_sub'
+training_dir = r'E:\python_workfile\sea_ice_classification\\training6'
 csv_path = training_dir +  r'\csv'
-sig_dir_path = training_dir + r"\sig0\npy"
-aari_dir_path =training_dir + r'\mask\npy'
+sig_dir_path = training_dir + r"\train_data\npy"
+aari_dir_path =training_dir + r'\aari\npy'
 # 20210608 处理pwp_250_07.h5
 sigmod_files = glob.glob(sig_dir_path + '\*.npy')
 aari_files = glob.glob(aari_dir_path+'\*.npy')
