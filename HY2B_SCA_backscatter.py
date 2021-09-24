@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # # HY-2B SCA L2A后向散射系数投影
 
 from mpl_toolkits.basemap import Basemap
@@ -38,10 +35,6 @@ def split_file_day(files):
     file_list.append(list)
     return file_list
 
-
-# In[3]:
-
-
 def get_img_from_fig(fig, dpi=180):
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=180)
@@ -53,7 +46,6 @@ def get_img_from_fig(fig, dpi=180):
     return img
 
 
-# In[4]:
 
 
 def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
@@ -64,9 +56,9 @@ def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
     hy_m = Basemap(projection='npaeqd', boundinglat=66, lon_0=90., resolution='c')
     hy_m.fillcontinents()
     hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet, shading='auto', vmax=-5, vmin=-25, latlon=True)
-    # hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet,vmax=0, vmin=3, latlon=True)
 
-    plt.colorbar(location='right')
+
+    plt.colorbar(location='right',fraction=0.045)
     hy_m.drawparallels(np.arange(-90., 120., 10.), labels=[1, 0, 0, 0])
     hy_m.drawmeridians(np.arange(-180., 180., 60.), labels=[0, 0, 0, 1])
     # you can get a high-resolution image as numpy array!!
@@ -77,7 +69,6 @@ def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
     # return fig
 
 
-# In[5]:
 
 
 satellite = r'HY2B'
@@ -98,22 +89,22 @@ files = glob.glob(dir_path + '\*_pwp_250_*.h5')
 
 file_list = split_file_day(files)
 
-# In[6]:
 
 
 transformer = HaiYangData.set_transformer(crs, crs2)
 transformer_back = HaiYangData.set_transformer(crs2, crs)
 
-train_data_dir = r'E:\python_workfile\sea_ice_classification\data\train_data\pic_bar_new'
-
-# In[7]:
+train_data_dir = r'E:\python_workfile\sea_ice_classification\data\train_data\\split_VV_HH'
 
 
-for files in file_list[coin_point:]:
+for files in file_list[388:]:
     name = files[0].split('_')[8].split('T')[0]
-    value_array = np.empty(shape=(1702, 810, 5))
-    grid_array = np.zeros((hy_sca.nlat, hy_sca.nlon))
-    grid_num_array = np.zeros((hy_sca.nlat, hy_sca.nlon))
+    value_array = np.empty(shape=(1702, 810, 6))
+    grid_array_VV = np.zeros((hy_sca.nlat, hy_sca.nlon))
+    grid_num_array_VV = np.zeros((hy_sca.nlat, hy_sca.nlon))
+
+    grid_array_HH = np.zeros((hy_sca.nlat, hy_sca.nlon))
+    grid_num_array_HH = np.zeros((hy_sca.nlat, hy_sca.nlon))
 
     for file in files:
         try:
@@ -123,12 +114,14 @@ for files in file_list[coin_point:]:
                 sigma0 = f['cell_sigma0'][:]
                 surface_flag = f['cell_sigma0_surface_flag'][:]
                 qual_flag = f['cell_sigma0_qual_flag'][:]
+                incidence_flag = f['cell_incidence'][:]
 
 
         except KeyError:
             continue
         except OSError:
             continue
+        incidence_flag = (incidence_flag / 100).astype(np.int16)
 
         sigma0 = sigma0 * 0.01
         lat[lat > 90] = 50
@@ -138,27 +131,54 @@ for files in file_list[coin_point:]:
 
         sigma0[surface_flag != 2] = -99999
         sigma0[qual_flag != 0] = -99999
-        # sigma0[sigma0 < -300] = 0
 
+
+        # sigma0[sigma0 < -300] = 0
         value_array[:, :, 0] = lat
         value_array[:, :, 1] = lon
         value_array[:, :, 2], value_array[:, :, 3] = transformer.transform(value_array[:, :, 0], value_array[:, :, 1])
         value_array[:, :, 4] = sigma0
 
-        x = (value_array[:, :, 2] / hy_sca.resolution).astype(np.int)
-        y = (value_array[:, :, 3] / hy_sca.resolution).astype(np.int)
+        sigma0_VV = sigma0[incidence_flag == 48]
+        sigma0_HH = sigma0[incidence_flag == 41]
+        x_VV = (value_array[:, :, 2][incidence_flag == 48] / hy_sca.resolution).astype(np.int16)
+        y_VV = (value_array[:, :, 3][incidence_flag == 48] / hy_sca.resolution).astype(np.int16)
+        x_HH = (value_array[:, :, 2][incidence_flag == 41] / hy_sca.resolution).astype(np.int16)
+        y_HH = (value_array[:, :, 3][incidence_flag == 41] / hy_sca.resolution).astype(np.int16)
+
+        # x = (value_array[:, :, 2] / hy_sca.resolution).astype(np.int16)
+        # y = (value_array[:, :, 3] / hy_sca.resolution).astype(np.int16)
         # x[x>=1600] = 0
         # y[y>=1600] = 0
-        grid_array[y, x] += value_array[:, :, 4]
-        grid_num_array[y, x] += 1
 
-    grid_array = grid_array / grid_num_array
-    grid_array[grid_array >= -5] = np.nan
-    grid_array[grid_array <= -300] = np.nan
+        # 处理VV极化下的sigma0
+
+        grid_array_VV[y_VV, x_VV] += sigma0_VV
+        grid_num_array_VV[y_VV, x_VV] += 1
+
+        # 处理HH极化下的sigma0
+
+        grid_array_HH[y_HH, x_HH] += sigma0_HH
+        grid_num_array_HH[y_HH, x_HH] += 1
+
+    grid_array_VV = grid_array_VV / grid_num_array_VV
+    grid_array_VV[grid_array_VV >= -5] = np.nan
+    grid_array_VV[grid_array_VV <= -300] = np.nan
+
+    grid_array_HH = grid_array_HH / grid_num_array_HH
+    grid_array_HH[grid_array_HH >= -5] = np.nan
+    grid_array_HH[grid_array_HH <= -300] = np.nan
 
     x_map, y_map = hy_sca.get_map_grid(transformer_back)
-    grid_array[y_map < 60] = np.nan
-    draw_sigmod_0(x_map, y_map, grid_array, train_data_dir + '\\' + str(name) + '.png')
 
-    # np.save((train_data_dir + r'\\npy\\' + str(name) + '.npy'), grid_array)
+    # 去除60°N以南的点
+    grid_array_VV[y_map < 60] = np.nan
+    grid_array_HH[y_map < 60] = np.nan
+
+    draw_sigmod_0(x_map, y_map, grid_array_VV, save_path=train_data_dir + '\\VV\\' + str(name) + '.png')
+    draw_sigmod_0(x_map, y_map, grid_array_HH, save_path=train_data_dir + '\\HH\\' + str(name) + '.png')
+
+    np.save((train_data_dir + r'\\VV\\npy\\' + str(name) + '.npy'), grid_array_VV)
+    np.save((train_data_dir + r'\\HH\\npy\\' + str(name) + '.npy'), grid_array_HH)
+
     print(name)

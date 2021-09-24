@@ -43,6 +43,30 @@ class HaiYangData(RSData):
         file_list.append(list)
         return file_list
 
+    def month_split(files):
+        '''
+        :files 文件列表
+        :returns 按月分的csv文件列表
+        '''
+        files.sort()
+        file_list = []
+        list = []
+        for i in range(len(files)):
+
+            if i == 0:
+                list.append(files[i])
+                continue
+
+            if (files[i].split('\\')[-1].split('.')[0][4:6]) == (
+                    files[i - 1].split('\\')[-1].split('.')[0][4:6]):
+                list.append(files[i])
+            else:
+                file_list.append(list)
+                list = []
+                list.append(files[i])
+        file_list.append(list)
+        return file_list
+
 
     def alt_from_nc_files(self, files, value):
         '''
