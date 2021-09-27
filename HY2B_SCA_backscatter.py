@@ -88,16 +88,16 @@ files = glob.glob(dir_path + '\*_pwp_250_*.h5')
 # files = glob.glob(dir_path + '\*_dps_250_0*.h5')
 
 file_list = split_file_day(files)
-
+use_type_flag = False
 
 
 transformer = HaiYangData.set_transformer(crs, crs2)
 transformer_back = HaiYangData.set_transformer(crs2, crs)
 
-train_data_dir = r'E:\python_workfile\sea_ice_classification\data\train_data\\split_VV_HH'
+train_data_dir = r'E:\python_workfile\sea_ice_classification\data\train_data\\\split_VV_HH_no_type'
 
 
-for files in file_list[388:]:
+for files in file_list[115:]:
     name = files[0].split('_')[8].split('T')[0]
     value_array = np.empty(shape=(1702, 810, 6))
     grid_array_VV = np.zeros((hy_sca.nlat, hy_sca.nlon))
@@ -129,8 +129,9 @@ for files in file_list[388:]:
         lon[lon > 360] = 0
         lat[lon > 360] = 50
 
-        sigma0[surface_flag != 2] = -99999
-        sigma0[qual_flag != 0] = -99999
+        if use_type_flag:
+            sigma0[surface_flag != 2] = -99999
+            sigma0[qual_flag != 0] = -99999
 
 
         # sigma0[sigma0 < -300] = 0

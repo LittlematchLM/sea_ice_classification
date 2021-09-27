@@ -74,9 +74,8 @@ crs = CRS.from_proj4("+proj=latlon")
 crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
-training_dir = r'E:\python_workfile\sea_ice_classification\training6\split_VV_HH\VV'
-csv_path = r'E:\python_workfile\sea_ice_classification\training6\csv\split_VV_HH\VV'
-sig_dir_path = r'E:\python_workfile\sea_ice_classification\training6\split_VV_HH\VV\npy'
+csv_path = r'E:\python_workfile\sea_ice_classification\data\csv\spilit_VV_HH_no_type_flag\VV'
+sig_dir_path = r'E:\python_workfile\sea_ice_classification\data\train_data\split_VV_HH_no_type_flag\VV\npy'
 aari_dir_path = r'E:\python_workfile\sea_ice_classification\training6\aari\npy'
 # 20210608 处理pwp_250_07.h5
 sigmod_files = glob.glob(sig_dir_path + '\*.npy')
