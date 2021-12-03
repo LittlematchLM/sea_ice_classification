@@ -5,3 +5,5 @@ if __name__ == '__main__':
     
     list = text.split('\n')
 list[1::7]
+
+

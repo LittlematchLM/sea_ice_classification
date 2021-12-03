@@ -74,10 +74,10 @@ crs = CRS.from_proj4("+proj=latlon")
 crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
-csv_path = r'E:\python_workfile\sea_ice_classification\data\csv\spilit_VV_HH_no_type_flag\VV'
-sig_dir_path = r'E:\python_workfile\sea_ice_classification\data\train_data\split_VV_HH_no_type_flag\VV\npy'
+csv_path = r'E:\python_workfile\sea_ice_classification\data\csv\\spilit_VV_HH_no_type_flag\HH'
+sig_dir_path = r'E:\python_workfile\sea_ice_classification\data\train_data\split_VV_HH_no_type_flag\HH\npy'
 aari_dir_path = r'E:\python_workfile\sea_ice_classification\training6\aari\npy'
-# 20210608 处理pwp_250_07.h5
+
 sigmod_files = glob.glob(sig_dir_path + '\*.npy')
 aari_files = glob.glob(aari_dir_path + '\*.npy')
 
@@ -114,6 +114,7 @@ for sig_file, aari_file in zip(sigmod_files[:], aari_files[:]):
 20210420，20210427，20210504
 '''
 
+dict = {}
 for sig_file in sigmod_files[:]:
     day_char = sig_file.split('\\')[-1].split('.')[0]
     day = datetime.date(year=int(day_char[:4]), month=int(day_char[4:6]), day=int(day_char[6:8]))
@@ -121,8 +122,8 @@ for sig_file in sigmod_files[:]:
     sig_grid = np.load(sig_file)
 
     df = pd.DataFrame(columns=['lon', 'lat', 'sig0', 'time', 'ice_type'])
-    df['lon'] = x_map.flatten()
-    df['lat'] = y_map.flatten()
+    # df['lon'] = x_map.flatten()
+    # df['lat'] = y_map.flatten()
     df['sig0'] = sig_grid.flatten()
     df['time'] = day
 
@@ -130,4 +131,10 @@ for sig_file in sigmod_files[:]:
     df = df.drop((df[df.ice_type == 0]).index)
     df = df.dropna(axis=0, subset=['sig0'])
     df.to_csv(csv_path + '\\' + day_char + '.csv', index=False)
+    dict[str(day_char)] = len(df)
     print(day_char, len(df))
+
+
+
+
+

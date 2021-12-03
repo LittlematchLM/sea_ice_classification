@@ -35,6 +35,7 @@ def split_file_day(files):
     file_list.append(list)
     return file_list
 
+
 def get_img_from_fig(fig, dpi=180):
     buf = io.BytesIO()
     fig.savefig(buf, format="png", dpi=180)
@@ -46,21 +47,18 @@ def get_img_from_fig(fig, dpi=180):
     return img
 
 
-
-
 def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
-    fig = plt.figure(figsize=(9, 9))
-    fig.add_subplot(111)
-    fig.set_tight_layout(True)  # reduce the spaces from margin outside the axis
+    fig = plt.figure(figsize=(7, 7))
+    # fig.add_subplot(111)
+    # fig.set_tight_layout(True)  # reduce the spaces from margin outside the axis
 
     hy_m = Basemap(projection='npaeqd', boundinglat=66, lon_0=90., resolution='c')
-    hy_m.fillcontinents()
+    # hy_m.fillcontinents()
     hy_m.pcolormesh(x_map, y_map, data=grid_array, cmap=plt.cm.jet, shading='auto', vmax=-5, vmin=-25, latlon=True)
 
-
-    plt.colorbar(location='right',fraction=0.045)
-    hy_m.drawparallels(np.arange(-90., 120., 10.), labels=[1, 0, 0, 0])
-    hy_m.drawmeridians(np.arange(-180., 180., 60.), labels=[0, 0, 0, 1])
+    # plt.colorbar(location='right',fraction=0.045)
+    # hy_m.drawparallels(np.arange(-90., 120., 10.), labels=[1, 0, 0, 0])
+    # hy_m.drawmeridians(np.arange(-180., 180., 60.), labels=[0, 0, 0, 1])
     # you can get a high-resolution image as numpy array!!
     if save_path:
         plt.savefig(save_path, dpi=180)
@@ -69,11 +67,9 @@ def draw_sigmod_0(x_map, y_map, grid_array, save_path=None):
     # return fig
 
 
-
-
 satellite = r'HY2B'
 sensor = r'SCA'
-hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=25000)
+hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=30000)
 coin_point = 0
 # 将WGS 84坐标（4326）转化为极射投影
 crs = CRS.from_epsg(4326)
@@ -82,22 +78,20 @@ crs = CRS.from_proj4("+proj=latlon")
 crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
-dir_path = r"j:\remote_sensing_data\back_scatter\HY-2B"
+dir_path = r"I:\remote_sensing_data\back_scatter\HY-2B"
 
 files = glob.glob(dir_path + '\*_pwp_250_*.h5')
 # files = glob.glob(dir_path + '\*_dps_250_0*.h5')
 
 file_list = split_file_day(files)
-use_type_flag = False
-
+use_type_flag = True
 
 transformer = HaiYangData.set_transformer(crs, crs2)
 transformer_back = HaiYangData.set_transformer(crs2, crs)
 
-train_data_dir = r'E:\python_workfile\sea_ice_classification\data\train_data\\\split_VV_HH_no_type'
+train_data_dir = r'F:\python_workspace\sea_ice_classification\data\npy\sigmod0\30000_resolution'
 
-
-for files in file_list[115:]:
+for files in file_list[-178:]:
     name = files[0].split('_')[8].split('T')[0]
     value_array = np.empty(shape=(1702, 810, 6))
     grid_array_VV = np.zeros((hy_sca.nlat, hy_sca.nlon))
@@ -132,7 +126,6 @@ for files in file_list[115:]:
         if use_type_flag:
             sigma0[surface_flag != 2] = -99999
             sigma0[qual_flag != 0] = -99999
-
 
         # sigma0[sigma0 < -300] = 0
         value_array[:, :, 0] = lat
@@ -176,10 +169,34 @@ for files in file_list[115:]:
     grid_array_VV[y_map < 60] = np.nan
     grid_array_HH[y_map < 60] = np.nan
 
-    draw_sigmod_0(x_map, y_map, grid_array_VV, save_path=train_data_dir + '\\VV\\' + str(name) + '.png')
-    draw_sigmod_0(x_map, y_map, grid_array_HH, save_path=train_data_dir + '\\HH\\' + str(name) + '.png')
+    # draw_sigmod_0(x_map, y_map, grid_array_VV, save_path=train_data_dir + '\\VV\\pic\\' + str(name) + '.png')
+    # draw_sigmod_0(x_map, y_map, grid_array_HH, save_path=train_data_dir + '\\HH\\pic\\' + str(name) + '.png')
 
     np.save((train_data_dir + r'\\VV\\npy\\' + str(name) + '.npy'), grid_array_VV)
     np.save((train_data_dir + r'\\HH\\npy\\' + str(name) + '.npy'), grid_array_HH)
 
     print(name)
+
+'''
+测试内容
+'''
+
+aari_npy_files = glob.glob(r'F:\python_workspace\sea_ice_classification\data\mask\aari\proj\grid_npy' + '\\*.npy')
+
+a = np.load(aari_npy_files[0])
+a = a.astype('float32')
+a[a == 0] = np.nan
+satellite = r'AARI'
+sensor = r'AARI'
+resolution = 25000
+hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=resolution)
+# 将WGS 84坐标（4326）转化为极射投影
+crs = CRS.from_epsg(4326)
+crs = CRS.from_string("epsg:4326")
+crs = CRS.from_proj4("+proj=latlon")
+crs = CRS.from_user_input(4326)
+crs2 = CRS(proj="aeqd")
+transformer = HaiYangData.set_transformer(crs, crs2)
+transformer_back = HaiYangData.set_transformer(crs2, crs)
+
+x_map, y_map = hy_sca.get_map_grid(transformer_back)

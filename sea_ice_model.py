@@ -3,7 +3,45 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import datetime
 from sklearn.model_selection import train_test_split
+import io
+import cv2
 
+HH_threshold_lut = {"201905":"-12",
+"201910":"-12",
+"201911":"-12",
+"201912":"-11.96949",
+"202001":"-12.63408",
+"202002":"-12.98586",
+"202003":"-13.05187",
+"202004":"-13.05196",
+"202005":"-12.45499",
+"202010":"-12",
+"202011":"-12",
+"202012":"-12.025733",
+"202101":"-12.642169",
+"202102":"-12.535940",
+"202103":"-12.555068",
+"202104":"-12.813603"
+}
+
+VV_threshold_lut = {
+"201905":"-12",
+"201910":"-12",
+"201911":"-12",
+"201912":"-12.438178",
+"202001":"-13.278439",
+"202002":"-13.628366",
+"202003":"-13.422885",
+"202004":"-13.522465",
+"202005":"-12",
+"202010":"-12",
+"202011":"-12",
+"202012":"-12.696600",
+"202101":"-13.315515",
+"202102":"-13.144006",
+"202103":"-13.153818",
+"202104":"-13.254424"
+}
 
 def data_split(data_df, object_col):
     Y = data_df[object_col]
@@ -16,11 +54,18 @@ def data_split(data_df, object_col):
     return X_train, X_test, Y_train, Y_test
 
 
+def threshold_lut(VV_HH):
+    if VV_HH == 'VV':
+        return VV_threshold_lut
+    else:
+        return HH_threshold_lut
 def strftime_week(time):
     day = datetime.date(int(time[:4]), int(time[5:7]), int(time[8:10]))
     day = datetime.datetime.strftime(day, '%W')
     return int(day)
 
+def strftime_year_month(time):
+    return str(time[:4]) + str(time[5:7])
 
 def strftime_day(time):
     day = datetime.date(int(time[:4]), int(time[5:7]), int(time[8:10]))
@@ -39,6 +84,10 @@ def strftime_year(time):
     day = datetime.datetime.strftime(day, '%Y')
     return int(day)
 
+def get_year_month_str(time):
+    year = str(time[:4])
+    month = str(time[5:7])
+    return int(year+month)
 
 def strftime_julian_week(time):
     # 计算从start_time开始过了多少周
@@ -83,6 +132,15 @@ def strftime_quarter(time):
     quarter = time[-1]
     return quarter
 
+def get_img_from_fig(fig, dpi=180):
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=180)
+    buf.seek(0)
+    img_arr = np.frombuffer(buf.getvalue(), dtype=np.uint8)
+    buf.close()
+    img = cv2.imdecode(img_arr, 1)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    return img
 
 def plot_confusion_matrix(classes, cm, savename, title='Confusion Matrix'):
     plt.figure(figsize=(12, 8), dpi=100)
@@ -140,7 +198,7 @@ def process_sea_ice_train_dataframe(dataframe, fyi_myi=True):
     dataframe['month'] = dataframe['time'].apply(strftime_month)
 
     dataframe['year'] = dataframe['time'].apply(strftime_year)
-
+    dataframe['year_month_str'] = dataframe['time'].apply(get_year_month_str)
     dataframe['julian_week'] = dataframe['time'].apply(strftime_julian_week)
     dataframe['julian_day'] = dataframe['time'].apply(strftime_julian_day)
 
