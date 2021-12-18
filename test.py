@@ -1,36 +1,36 @@
-import shapefile
-import geopandas
+# creating 3d plot using matplotlib
+# in python
 
-file = r'E://python_workfile//sea_ice_classification//data//aari_arc_20210406_pl_a'
-#
-# shps = shapefile.Reader(file)
-# shp = shps.shapeRecord()
-shps_pandas = geopandas.read_file(file+'.shp')
-# shps.plot()
+# for creating a responsive plot
+# %matplotlib widget
 
-import numpy as np
+# importing required libraries
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap as Basemap
-from matplotlib.patches import Polygon
-# 设置地图的坐标系和坐标显示范围
-fig = plt.figure(figsize=(16, 9))
-ax1 = fig.add_axes([0.1,0.1,0.8,0.8])
-m = Basemap(projection='npaeqd', boundinglat=40, lon_0=180, resolution='c')
-m.fillcontinents()
-m.drawmapboundary()
+auto_add_to_figure=False
+# creating random dataset
+xs = [14, 24, 43, 47, 54, 66, 74, 89, 12,
+	44, 1, 2, 3, 4, 5, 9, 8, 7, 6, 5]
 
-shp_info = m.readshapefile(file,'aari_arc')
+ys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 6, 3,
+	5, 2, 4, 1, 8, 7, 0, 5]
 
+zs = [9, 6, 3, 5, 2, 4, 1, 8, 7, 0, 1, 2,
+	3, 4, 5, 6, 7, 8, 9, 0]
 
-names = []
-for info, shp in zip(m.aari_arc_info, m.aari_arc):
-    cat = info['CD']
-    # print(cat)
-    if cat == '99':
-        # print('cat')
-        poly = Polygon(shp, facecolor='g', edgecolor='c', lw=3)  # 绘制广东省区域
-        ax1.add_patch(poly)
+# creating figure
+fig = plt.figure()
+
+ax = Axes3D(fig)
+fig.add_axes(ax)
+# creating the plot
+plot_geeks = ax.scatter(xs, ys, zs, color='green')
+
+# setting title and labels
+ax.set_title("3D plot")
+ax.set_xlabel('x-axis')
+ax.set_ylabel('y-axis')
+ax.set_zlabel('z-axis')
+
+# displaying the plot
 plt.show()
-    # name = shapedict['NAME']
-    # if cat in ['H4','H5'] and name not in names:
-    #     if name != 'NOT NAMED':  names.append(name)

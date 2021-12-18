@@ -55,7 +55,9 @@ transformer = HaiYangData.set_transformer(crs, crs2)
 transformer_back = HaiYangData.set_transformer(crs2, crs)
 x_map, y_map = hy_sca.get_map_grid(transformer_back)
 
-for VV_npy_file, HH_npy_file in zip(VV_npy_files, HH_npy_files):
+
+VV_npy_file, HH_npy_file = VV_npy_files[11], HH_npy_files[11]
+for VV_npy_file, HH_npy_file in zip(VV_npy_files[251:], HH_npy_files[251:]):
     name = VV_npy_file.split('\\')[-1].split('.')[0]
     HH_grid = np.load(HH_npy_file)
     VV_grid = np.load(VV_npy_file)
@@ -67,23 +69,62 @@ for VV_npy_file, HH_npy_file in zip(VV_npy_files, HH_npy_files):
     ratio_grid = VV_grid / HH_grid
     polar_ratio_grid = VV_sub_HH_grid / VV_add_HH_grid
 
-    HH_gray = get_gray_array_from_grid(HH_grid, -5, -25)
-    VV_gray = get_gray_array_from_grid(VV_grid, -5, -25)
+    lon_grid = np.copy(x_map)
+    lon_grid[np.isnan(HH_grid)] = np.nan
+    lat_grid = np.copy(y_map)
+    lat_grid[np.isnan(HH_grid)] = np.nan
+
+    # HH_gray = get_gray_array_from_grid(HH_grid, -5, -25)
+    # VV_gray = get_gray_array_from_grid(VV_grid, -5, -25)
     polar_ratio_gray = get_gray_array_from_grid(polar_ratio_grid, 0.08, -0.08)
     ratio_gray = get_gray_array_from_grid(ratio_grid, 1.25, 0.75)
+    lon_gray = get_gray_array_from_grid(lon_grid, 180, -180)
+    lat_gray = get_gray_array_from_grid(lat_grid, 90, 45)
+
+    # 生成lat,lon,VV/HH
+    img1_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\lat_lon_ratio'
+    img1 = composite_img(1260, 1260, lon_gray, lat_gray, ratio_gray)
+    img1.save(img1_save_path + f'\\{name}.png')
+
+    # 生成lat_lon_polaration
+    img2_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\lat_lon_polaration'
+    img2 = composite_img(1260, 1260, lon_gray, lat_gray, polar_ratio_gray)
+    img2.save(img2_save_path + f'\\{name}.png')
+
+    # # 生成VV_ratio_polaration
+    # img3_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\VV_ratio_polaration'
+    # img3 = composite_img(1260, 1260, VV_gray, ratio_gray, polar_ratio_gray)
+    # img3.save(img3_save_path + f'\\{name}.png')
 
 
-    # # 生成lat,lon,VV/HH
-    # img1_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\lat_lon_ratio'
-    # img1 = composite_img(1260, 1260, lon_gray, lat_gray, ratio_gray)
-    # img1.save(img1_save_path + f'\\{name}.png')
-    #
-    # # 生成lat_lon_polaration
-    # img2_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\lat_lon_polaration'
-    # img2 = composite_img(1260, 1260, lon_gray, lat_gray, polar_ratio_gray)
-    # img2.save(img2_save_path + f'\\{name}.png')
+lat_grid[800:,:]=np.nan
+lon_grid[800:,:]=np.nan
 
-    # 生成VV_ratio_polaration
-    img3_save_path = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\VV_ratio_polaration'
-    img3 = composite_img(1260, 1260, VV_gray, ratio_gray, polar_ratio_gray)
-    img3.save(img3_save_path + f'\\{name}.png')
+fig = plt.figure(figsize=(7, 7))
+hy_m = Basemap(projection='npaeqd', boundinglat=66, lon_0=90., resolution='c')
+hy_m.pcolormesh(x_map, y_map, data=lat_grid, cmap=plt.cm.jet, shading='auto', vmax=90, vmin=50,
+                latlon=True)
+
+# plt.colorbar()
+plt.axis('off')
+plt.show()
+
+plot_img_np = get_img_from_fig(fig)
+
+new_array = np.full(shape=plot_img_np.shape[:2], fill_value=0)
+for i in range(3):
+    new_array += plot_img_np[:, :, i]
+
+plt.imshow(plot_img_np[:, :, 0])
+plt.show()
+
+# 对经度进行归一化
+plot_img_np = 360 / 255 * (plot_img_np[:, :, 0]) - 180
+
+# 对纬度进行归一化
+# plot_img_np = 33 / 217 * (plot_img_np[:, :, 0] - 38) + 57
+plot_img_np = (new_array - 114)/(765-114)*33 + 57
+
+np.save(r'.\training7\lat_lon_array\lat.npy', plot_img_np)
+cv2.imwrite(r".\training7\lat_lon_array\lat.png", plot_img_np)
+

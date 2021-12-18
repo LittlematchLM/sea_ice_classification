@@ -91,6 +91,7 @@ transformer_back = HaiYangData.set_transformer(crs2, crs)
 
 train_data_dir = r'F:\python_workspace\sea_ice_classification\data\npy\sigmod0\30000_resolution'
 
+
 for files in file_list[-178:]:
     name = files[0].split('_')[8].split('T')[0]
     value_array = np.empty(shape=(1702, 810, 6))
@@ -177,26 +178,4 @@ for files in file_list[-178:]:
 
     print(name)
 
-'''
-测试内容
-'''
 
-aari_npy_files = glob.glob(r'F:\python_workspace\sea_ice_classification\data\mask\aari\proj\grid_npy' + '\\*.npy')
-
-a = np.load(aari_npy_files[0])
-a = a.astype('float32')
-a[a == 0] = np.nan
-satellite = r'AARI'
-sensor = r'AARI'
-resolution = 25000
-hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=resolution)
-# 将WGS 84坐标（4326）转化为极射投影
-crs = CRS.from_epsg(4326)
-crs = CRS.from_string("epsg:4326")
-crs = CRS.from_proj4("+proj=latlon")
-crs = CRS.from_user_input(4326)
-crs2 = CRS(proj="aeqd")
-transformer = HaiYangData.set_transformer(crs, crs2)
-transformer_back = HaiYangData.set_transformer(crs2, crs)
-
-x_map, y_map = hy_sca.get_map_grid(transformer_back)
