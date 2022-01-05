@@ -43,7 +43,7 @@ HH_npy_files = glob.glob(HH_npy_dir + '\\*.npy')
 img_save_dir = r'E:\python_workfile\sea_ice_classification\training7\dataset\input_value\VV_HH_polarratio_real'
 satellite = r'HY2B'
 sensor = r'SCA'
-hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=25000)
+hy_sca = HaiYangData(satellite=satellite, sensor=sensor, resolution=30000)
 
 # 将WGS 84坐标（4326）转化为极射投影
 crs = CRS.from_epsg(4326)

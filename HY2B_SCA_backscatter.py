@@ -92,7 +92,7 @@ transformer_back = HaiYangData.set_transformer(crs2, crs)
 train_data_dir = r'F:\python_workspace\sea_ice_classification\data\npy\sigmod0\30000_resolution'
 
 
-for files in file_list[-178:]:
+for files in file_list[:]:
     name = files[0].split('_')[8].split('T')[0]
     value_array = np.empty(shape=(1702, 810, 6))
     grid_array_VV = np.zeros((hy_sca.nlat, hy_sca.nlon))

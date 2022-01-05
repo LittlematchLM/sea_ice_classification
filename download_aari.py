@@ -11,7 +11,7 @@ if __name__ == '__main__':
                         day1 = str(0) + str(day)
                     else:
                         day1 = str(day)
-                    f.write(r'http://www.aari.ru/resources/d0015/arctic/sigrid/' + str(year) + r'/' +  r'aari_arc_'
+                    f.write(r'http://wdc.aari.ru/datasets/d0015/arcice/' + str(year) + r'/' +  r'aari_arc_'
                             +str(year)+str(month1)+str(day1)+'_pl_a.zip' + '\n')
 
 

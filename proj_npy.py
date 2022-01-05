@@ -30,14 +30,12 @@ transformer = HaiYangData.set_transformer(crs, crs2)
 transformer_back = HaiYangData.set_transformer(crs2, crs)
 x_map, y_map = hy_sca.get_map_grid(transformer_back)
 
-
 '''
 获取文件名称
 '''
 val_dir = r'E:\python_workfile\sea_ice_classification\training6\csv\add_threshold\val'
-val_files = glob.glob(val_dir+'\\*.csv')
+val_files = glob.glob(val_dir + '\\*.csv')
 val_day = [val_file.split('\\')[-1].split('.')[0] for val_file in val_files]
-
 
 lat_npy_files = glob.glob(r'E:\python_workfile\sea_ice_classification\training7\lat_lon_array\lat_small_size\*.npy')
 lon_npy_files = glob.glob(r'E:\python_workfile\sea_ice_classification\training7\lat_lon_array\lon_small_size\*.npy')
@@ -54,7 +52,7 @@ FYI = mpatches.Patch(color='lime', label='First Year Ice')
 YI = mpatches.Patch(color='dodgerblue', label='Young Ice')
 N = mpatches.Patch(color='midnightblue', label='Nilas')
 
-#pri_mask_files_list = pri_mask_files_lists[5]
+# pri_mask_files_list = pri_mask_files_lists[5]
 
 
 for i, pri_mask_files_list in enumerate(pri_mask_files_lists):
@@ -82,18 +80,18 @@ for i, pri_mask_files_list in enumerate(pri_mask_files_lists):
     # 画图
     fig = plt.figure(figsize=(9, 9))
     fig.add_subplot(111)
-    fig.set_tight_layout(True) # reduce the spaces from margin outside the axis
+    fig.set_tight_layout(True)  # reduce the spaces from margin outside the axis
 
     hy_m = Basemap(projection='npaeqd', boundinglat=66, lon_0=90., resolution='c')
     hy_m.fillcontinents()
     hy_m.pcolor(x_map, y_map, data=grid_array_VV, cmap=plt.cm.jet, shading='auto', latlon=True)
     plt.legend(loc='upper right', handles=[FI, OI, FYI, YI, N], title='Ice Type')
-    plt.colorbar(location='right', fraction=0.045)
+    # plt.colorbar(location='right', fraction=0.045)
     hy_m.drawparallels(np.arange(-90., 120., 10.), labels=[1, 0, 0, 0])
     hy_m.drawmeridians(np.arange(-180., 180., 60.), labels=[0, 0, 0, 1])
     # you can get a high-resolution image as numpy array!!
     plt.title(f'predict mask {day}')
-    plt.savefig(png_save_path+f'\\{day}.png')
+    plt.savefig(png_save_path + f'\\{day}.png')
     # plt.show()
 
     # 存数据（1333，1333）
@@ -119,24 +117,6 @@ for i, pri_mask_files_list in enumerate(pri_mask_files_lists):
         grid_array_VV[y, x] = pri_mask
     grid_array_VV[grid_array_VV == 0] = np.nan
     np.save(grid_save_path + f'//{day}.npy', grid_array_VV)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # 记录数据nan的点 插值后用这个扣一遍
 grid_nan_mask = np.isnan(grid_array_VV)

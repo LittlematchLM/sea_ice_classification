@@ -75,7 +75,7 @@ crs = CRS.from_user_input(4326)
 crs2 = CRS(proj="aeqd")
 
 csv_path = r'E:\python_workfile\sea_ice_classification\data\csv\\spilit_VV_HH_no_type_flag\HH'
-sig_dir_path = r'E:\python_workfile\sea_ice_classification\data\train_data\split_VV_HH_no_type_flag\HH\npy'
+sig_dir_path = r'F:\python_workspace\sea_ice_classification\data\npy\sigmod0\30000_resolution\VV\npy'
 aari_dir_path = r'E:\python_workfile\sea_ice_classification\training6\aari\npy'
 
 sigmod_files = glob.glob(sig_dir_path + '\*.npy')
